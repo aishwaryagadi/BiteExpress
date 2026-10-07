@@ -7,8 +7,10 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
 body { background-color: #FFF5EE; }
-.navbar { background-color: #222; padding: 14px 40px; }
+.navbar { background-color: #222; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; }
 .navbar a { font-size: 20px; font-weight: bold; color: #fff; text-decoration: none; }
+.navbar a.logout { font-size: 13px; font-weight: normal; color: #ccc; }
+.navbar a.logout:hover { color: #FF6B35; }
 .navbar .accent { color: #FF6B35; }
 .badge { background-color: #FF6B35; color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 6px; margin-left: 10px; }
 .page-header { padding: 30px 40px 10px; }
@@ -32,6 +34,7 @@ tr:hover td { background-color: #FFFAF7; }
 
 <div class="navbar">
 <a href="<%= request.getContextPath() %>/index.jsp">Bite<span class="accent">Express</span><span class="badge">ADMIN</span></a>
+<a class="logout" href="<%= request.getContextPath() %>/admin/login?logout=1">Logout</a>
 </div>
 
 <div class="page-header">
