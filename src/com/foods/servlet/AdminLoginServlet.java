@@ -14,7 +14,7 @@ public class AdminLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final String ADMIN_USER = "admin";
-    private static final String ADMIN_PASS = "admin123";
+    private static final String ADMIN_PASS = "12345";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (request.getParameter("logout") != null) {
