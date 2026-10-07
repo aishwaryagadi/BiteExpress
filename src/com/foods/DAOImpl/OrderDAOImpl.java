@@ -68,4 +68,20 @@ public class OrderDAOImpl implements OrderDAO {
         }
         return list;
     }
+
+    @Override
+    public boolean updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE OrderTable SET Status = ? WHERE OrderId = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

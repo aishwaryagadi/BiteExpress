@@ -28,6 +28,9 @@ tr:hover td { background-color: #FFFAF7; }
 .status-cancelled { background-color: #FFE5E0; color: #C0392B; }
 .status-default { background-color: #eee; color: #555; }
 .empty-state { padding: 60px 40px; text-align: center; color: #999; }
+.status-form { display: flex; gap: 6px; }
+.status-form select { padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; }
+.status-form button { padding: 6px 12px; background: #FF6B35; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -45,6 +48,7 @@ tr:hover td { background-color: #FFFAF7; }
 <%
 @SuppressWarnings("unchecked")
 List<Order> orderList = (List<Order>) request.getAttribute("orderList");
+String[] statuses = {"PLACED", "PREPARING", "DELIVERED", "CANCELLED"};
 %>
 
 <% if (orderList != null && !orderList.isEmpty()) { %>
@@ -58,6 +62,7 @@ List<Order> orderList = (List<Order>) request.getAttribute("orderList");
 <th>Status</th>
 <th>Payment Method</th>
 <th>Restaurant ID</th>
+<th>Change Status</th>
 </tr>
 <% for (Order o : orderList) {
 String status = o.getStatus() != null ? o.getStatus().toLowerCase() : "";
@@ -75,6 +80,17 @@ else if (status.contains("cancel")) statusClass = "status-cancelled";
 <td><span class="status-badge <%= statusClass %>"><%= o.getStatus() %></span></td>
 <td><%= o.getPaymentMethod() %></td>
 <td><%= o.getRestaurantId() %></td>
+<td>
+<form class="status-form" action="<%= request.getContextPath() %>/admin/updateStatus" method="post">
+<input type="hidden" name="orderId" value="<%= o.getOrderId() %>">
+<select name="status">
+<% for (String s : statuses) { %>
+<option value="<%= s %>" <%= s.equalsIgnoreCase(o.getStatus()) ? "selected" : "" %>><%= s %></option>
+<% } %>
+</select>
+<button type="submit">Update</button>
+</form>
+</td>
 </tr>
 <% } %>
 </table>
