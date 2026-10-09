@@ -1,4 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    if (session.getAttribute("loggedInUser") == null) {
+        response.sendRedirect("login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,9 +27,12 @@ label { font-weight: bold; color: #222; font-size: 14px; }
 
 <div class="navbar">
     <span class="logo">Bite<span>Express</span></span>
-    <a href="index.jsp">Home</a>
-    <a href="restaurants">Restaurants</a>
-    <a href="login.jsp">Login</a>
+    <div>
+        <a href="index.jsp">Home</a>
+        <a href="restaurants">Restaurants</a>
+        <a href="myorders">My Orders</a>
+        <a href="logout">Logout</a>
+    </div>
 </div>
 
 <div class="page-header">

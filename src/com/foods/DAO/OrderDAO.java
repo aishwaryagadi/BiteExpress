@@ -7,4 +7,5 @@ public interface OrderDAO {
     boolean insertOrder(Order order);
     List<Order> getAllOrders();
     boolean updateOrderStatus(int orderId, String status);
+    List<Order> getOrdersByUser(int userId);
 }

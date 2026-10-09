@@ -11,6 +11,7 @@ import com.foods.DAOImpl.OrderItemDAOImpl;
 import com.foods.model.CartItem;
 import com.foods.model.OrderItem;
 import com.foods.model.Order;
+import com.foods.model.User;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -18,6 +19,12 @@ public class CheckoutServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
+
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
 
         @SuppressWarnings("unchecked")
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
@@ -45,7 +52,7 @@ public class CheckoutServlet extends HttpServlet {
         order.setOrderDate(new Timestamp(System.currentTimeMillis()));
         order.setTotalAmount(total);
         order.setStatus("PLACED");
-        order.setUserId(1); // TODO: replace with actual logged-in user's ID later
+        order.setUserId(user.getUserId());
         order.setPaymentMethod("Cash on Delivery");
 
         OrderDAOImpl orderDAO = new OrderDAOImpl();

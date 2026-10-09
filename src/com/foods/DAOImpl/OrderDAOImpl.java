@@ -53,15 +53,7 @@ public class OrderDAOImpl implements OrderDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Order o = new Order();
-                o.setOrderId(rs.getInt("OrderId"));
-                o.setUserId(rs.getInt("UserId"));
-                o.setOrderDate(rs.getTimestamp("OrderDate"));
-                o.setTotalAmount(rs.getDouble("TotalAmount"));
-                o.setStatus(rs.getString("Status"));
-                o.setPaymentMethod(rs.getString("PaymentMethod"));
-                o.setRestaurantId(rs.getInt("RestaurantId"));
-                list.add(o);
+                list.add(mapRow(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,5 +75,36 @@ public class OrderDAOImpl implements OrderDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public List<Order> getOrdersByUser(int userId) {
+        List<Order> list = new ArrayList<>();
+        String sql = "SELECT * FROM OrderTable WHERE UserId = ? ORDER BY OrderId DESC";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Order mapRow(ResultSet rs) throws SQLException {
+        Order o = new Order();
+        o.setOrderId(rs.getInt("OrderId"));
+        o.setUserId(rs.getInt("UserId"));
+        o.setOrderDate(rs.getTimestamp("OrderDate"));
+        o.setTotalAmount(rs.getDouble("TotalAmount"));
+        o.setStatus(rs.getString("Status"));
+        o.setPaymentMethod(rs.getString("PaymentMethod"));
+        o.setRestaurantId(rs.getInt("RestaurantId"));
+        return o;
     }
 }
