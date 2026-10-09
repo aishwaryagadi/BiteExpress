@@ -92,6 +92,7 @@ body { background-color: #FFF5EE; min-height: 100vh; }
             User navUser = (User) session.getAttribute("loggedInUser");
             if (navUser != null) {
         %>
+        	<a href="myorders">My Orders</a>
             <a href="profile.jsp">Profile</a>
             <a href="logout">Logout</a>
         <% } else { %>
