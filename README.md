@@ -4,11 +4,11 @@ A food ordering web application built with Java Servlets, JSP and MySQL.
 
 ## Features
 
+- Customer signup, login and logout
 - Browse restaurants and their menus
-- Add items to a cart
-- Checkout with Cash on Delivery and an order confirmation page showing the order ID
-- Orders and order items saved in a MySQL database
-- Admin login with a page listing all orders
+- Shopping cart and checkout (Cash on Delivery)
+- My Orders page showing each customer's own orders and their status
+- Admin login and an admin page to view all orders and update their status
 
 ## Tech Stack
 
@@ -16,20 +16,25 @@ A food ordering web application built with Java Servlets, JSP and MySQL.
 - Apache Tomcat 10
 - MySQL
 - JDBC
-- Eclipse IDE
+- HTML and CSS
 
 ## How to Run
 
-1. Install Java, Apache Tomcat 10 and MySQL.
-2. Create a MySQL database named `foodapp` with the tables `menu`, `orderitem`, `ordertable`, `restaurant` and `users`.
-3. Open `src/com/foods/util/DBConnection.java` and set your MySQL username and password.
-4. Import the project into Eclipse and add it to a Tomcat server.
+1. Install JDK, Eclipse IDE for Enterprise Java, Apache Tomcat 10 and MySQL.
+2. In MySQL Workbench, create a database named `foodapp` and create the tables: `users`, `restaurant`, `menu`, `ordertable` and `orderitem`.
+3. Open `DBConnection.java` in `com.foods.util` and set your own MySQL username and password.
+4. Import the project into Eclipse and add it to the Tomcat server.
 5. Start Tomcat and open `http://localhost:8080/food/`.
 
-## Admin Page
+## Pages
 
-Go to `http://localhost:8080/food/admin/orders` and log in to see all orders.
+| Page | URL |
+|------|-----|
+| Home | `/food/index.jsp` |
+| Restaurants | `/food/restaurants` |
+| My Orders | `/food/myorders` |
+| Admin Orders | `/food/admin/orders` |
 
 ## Author
 
-Aishwarya
+Aishwarya Gadi
