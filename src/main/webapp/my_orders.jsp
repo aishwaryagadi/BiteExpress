@@ -1,77 +1,135 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, com.foods.model.Order" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.foods.model.Order" %>
+<%@ page import="com.foods.model.User" %>
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>My Orders | BiteExpress</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-body { background-color: #FFF5EE; }
-.navbar { background-color: #222; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; }
-.navbar a { color: #fff; text-decoration: none; font-weight: bold; }
-.navbar .accent { color: #FF6B35; }
-.page-header { padding: 30px 40px 10px; }
-.page-header h1 { color: #222; font-size: 24px; }
-.table-wrapper { margin: 20px 40px 50px; background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; background-color: #FFF0E8; color: #333; padding: 14px 16px; font-size: 12px; text-transform: uppercase; }
-td { padding: 14px 16px; border-top: 1px solid #f0f0f0; color: #333; }
-.status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-.status-placed { background-color: #FFF4E0; color: #B8860B; }
-.status-preparing { background-color: #E3F2FD; color: #1565C0; }
-.status-delivered { background-color: #E8F5E9; color: #2E7D32; }
-.status-cancelled { background-color: #FFE5E0; color: #C0392B; }
-.status-default { background-color: #eee; color: #555; }
-.empty-state { padding: 60px 40px; text-align: center; color: #999; }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #FFF4EE;
+        color: #222;
+    }
+    .navbar {
+        background: #222;
+        padding: 16px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo { color: #fff; font-size: 20px; font-weight: bold; }
+    .logo span { color: #FF6B35; }
+    .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        margin-left: 24px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .nav-links a:hover { color: #FF6B35; }
+
+    .container { padding: 30px 40px; }
+    h1 { font-size: 26px; margin: 0 0 24px; }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .orders-table th {
+        background: #FFEFE5;
+        text-align: left;
+        padding: 14px 18px;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+    .orders-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        border-top: 1px solid #f1e6df;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .placed    { background: #FFF1D6; color: #B7791F; }
+    .preparing { background: #DDEBFF; color: #1D4ED8; }
+    .delivered { background: #DDF5E3; color: #1E8A3C; }
+    .cancelled { background: #FDE0E0; color: #C53030; }
+
+    .empty {
+        text-align: center;
+        color: #999;
+        margin-top: 60px;
+        font-size: 16px;
+    }
 </style>
 </head>
 <body>
 
 <div class="navbar">
-<a href="<%= request.getContextPath() %>/index.jsp">Bite<span class="accent">Express</span></a>
-<a href="<%= request.getContextPath() %>/restaurants">Restaurants</a>
+    <span class="logo">Bite<span>Express</span></span>
+    <div class="nav-links">
+        <a href="index.jsp">Home</a>
+        <a href="restaurants">Restaurants</a>
+        <%
+            User navUser = (User) session.getAttribute("loggedInUser");
+            if (navUser != null) {
+        %>
+            <a href="myorders">My Orders</a>
+            <a href="profile.jsp">Profile</a>
+            <a href="logout">Logout</a>
+        <% } else { %>
+            <a href="login.jsp">Login</a>
+        <% } %>
+    </div>
 </div>
 
-<div class="page-header">
-<h1>My Orders</h1>
-</div>
+<div class="container">
+    <h1>My Orders</h1>
 
-<%
-@SuppressWarnings("unchecked")
-List<Order> orders = (List<Order>) request.getAttribute("orders");
-%>
-
-<% if (orders != null && !orders.isEmpty()) { %>
-<div class="table-wrapper">
-<table>
-<tr>
-<th>Order ID</th>
-<th>Date</th>
-<th>Total</th>
-<th>Status</th>
-<th>Payment</th>
-</tr>
-<% for (Order o : orders) {
-String status = o.getStatus() != null ? o.getStatus().toLowerCase() : "";
-String statusClass = "status-default";
-if (status.contains("placed") || status.contains("pending")) statusClass = "status-placed";
-else if (status.contains("prepar")) statusClass = "status-preparing";
-else if (status.contains("deliver")) statusClass = "status-delivered";
-else if (status.contains("cancel")) statusClass = "status-cancelled";
-%>
-<tr>
-<td>#<%= o.getOrderId() %></td>
-<td><%= o.getOrderDate() %></td>
-<td>₹<%= o.getTotalAmount() %></td>
-<td><span class="status-badge <%= statusClass %>"><%= o.getStatus() %></span></td>
-<td><%= o.getPaymentMethod() %></td>
-</tr>
-<% } %>
-</table>
+    <%
+        List<Order> orders = (List<Order>) request.getAttribute("orders");
+        if (orders == null || orders.isEmpty()) {
+    %>
+        <p class="empty">You haven't placed any orders yet.</p>
+    <% } else { %>
+        <table class="orders-table">
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Payment</th>
+            </tr>
+            <% for (Order o : orders) { %>
+            <tr>
+                <td>#<%= o.getOrderId() %></td>
+                <td><%= o.getOrderDate() %></td>
+                <td>&#8377;<%= o.getTotalAmount() %></td>
+                <td>
+                    <span class="badge <%= o.getStatus().toLowerCase() %>">
+                        <%= o.getStatus() %>
+                    </span>
+                </td>
+                <td><%= o.getPaymentMethod() %></td>
+            </tr>
+            <% } %>
+        </table>
+    <% } %>
 </div>
-<% } else { %>
-<div class="empty-state"><p>You haven't placed any orders yet.</p></div>
-<% } %>
 
 </body>
 </html>
