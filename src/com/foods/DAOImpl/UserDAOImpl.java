@@ -2,6 +2,8 @@ package com.foods.DAOImpl;
 
 import java.sql.*;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 import com.foods.DAO.UserDAO;
 import com.foods.model.User;
 import com.foods.util.DBConnection;
@@ -11,11 +13,12 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public boolean registerUser(User u) {
         String sql = "INSERT INTO users (Name, Phone, Password, Email) VALUES (?, ?, ?, ?)";
+        String hash = BCrypt.withDefaults().hashToString(12, u.getPassword().toCharArray());
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, u.getName());
             ps.setString(2, u.getPhone());
-            ps.setString(3, u.getPassword());
+            ps.setString(3, hash);
             ps.setString(4, u.getEmail());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -26,25 +29,49 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User loginUser(String phone, String password) {
-        String sql = "SELECT * FROM users WHERE Phone=? AND Password=?";
+        String sql = "SELECT * FROM users WHERE Phone=?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, phone);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                User u = new User();
-                u.setUserId(rs.getInt("UserId"));
-                u.setName(rs.getString("Name"));
-                u.setPhone(rs.getString("Phone"));
-                u.setPassword(rs.getString("Password"));
-                u.setEmail(rs.getString("Email"));
-                return u;
+                int userId = rs.getInt("UserId");
+                String stored = rs.getString("Password");
+                boolean ok;
+
+                if (stored != null && stored.startsWith("$2")) {
+                    // Already hashed
+                    ok = BCrypt.verifyer().verify(password.toCharArray(), stored).verified;
+                } else {
+                    // Old plain-text password: accept it once, then upgrade it to a hash
+                    ok = stored != null && stored.equals(password);
+                    if (ok) {
+                        upgradePassword(con, userId, password);
+                    }
+                }
+
+                if (ok) {
+                    User u = new User();
+                    u.setUserId(userId);
+                    u.setName(rs.getString("Name"));
+                    u.setPhone(rs.getString("Phone"));
+                    u.setEmail(rs.getString("Email"));
+                    return u;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void upgradePassword(Connection con, int userId, String plain) throws SQLException {
+        String hash = BCrypt.withDefaults().hashToString(12, plain.toCharArray());
+        try (PreparedStatement ps = con.prepareStatement("UPDATE users SET Password=? WHERE UserId=?")) {
+            ps.setString(1, hash);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
     }
 
     @Override
