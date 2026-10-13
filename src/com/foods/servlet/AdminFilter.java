@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebFilter("/admin/*")
+@WebFilter(urlPatterns = {"/admin/*", "/admin_orders.jsp"})
 public class AdminFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -25,7 +25,7 @@ public class AdminFilter implements Filter {
         }
 
         HttpSession session = request.getSession(false);
-        boolean loggedIn = session != null && session.getAttribute("adminLoggedIn") != null;
+        boolean loggedIn = session != null && Boolean.TRUE.equals(session.getAttribute("adminLoggedIn"));
 
         if (loggedIn) {
             chain.doFilter(req, res);
