@@ -1,6 +1,10 @@
 package com.foods.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Properties;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,8 +17,31 @@ import jakarta.servlet.http.HttpSession;
 public class AdminLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final String ADMIN_USER = "admin";
-    private static final String ADMIN_PASS = "admin123";
+    private static String adminUser;
+    private static String adminPass;
+
+    static {
+        Properties props = new Properties();
+        try (InputStream in = AdminLoginServlet.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (in == null) {
+                throw new RuntimeException("db.properties not found");
+            }
+            props.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read db.properties", e);
+        }
+        adminUser = props.getProperty("admin.username");
+        adminPass = props.getProperty("admin.password");
+    }
+
+    private static boolean same(String a, String b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(
+                a.getBytes(StandardCharsets.UTF_8),
+                b.getBytes(StandardCharsets.UTF_8));
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (request.getParameter("logout") != null) {
@@ -32,7 +59,8 @@ public class AdminLoginServlet extends HttpServlet {
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
 
-        if (ADMIN_USER.equals(user) && ADMIN_PASS.equals(pass)) {
+        if (same(adminUser, user) && same(adminPass, pass)) {
+            request.changeSessionId();
             request.getSession().setAttribute("adminLoggedIn", true);
             response.sendRedirect(request.getContextPath() + "/admin/orders");
         } else {
