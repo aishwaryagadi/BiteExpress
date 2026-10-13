@@ -57,6 +57,9 @@
         border-top: 1px solid #f1e6df;
     }
 
+    .order-link { color: #FF6B35; font-weight: bold; text-decoration: none; }
+    .order-link:hover { text-decoration: underline; }
+
     .badge {
         padding: 4px 10px;
         border-radius: 10px;
@@ -116,7 +119,7 @@
             </tr>
             <% for (Order o : orders) { %>
             <tr>
-                <td>#<%= o.getOrderId() %></td>
+                <td><a class="order-link" href="orderdetails?id=<%= o.getOrderId() %>">#<%= o.getOrderId() %></a></td>
                 <td><%= o.getOrderDate() %></td>
                 <td>&#8377;<%= o.getTotalAmount() %></td>
                 <td>
