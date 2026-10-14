@@ -96,6 +96,21 @@ public class OrderDAOImpl implements OrderDAO {
         return list;
     }
 
+    // A customer can cancel only their own order, and only while it is still PLACED
+    public boolean cancelOrder(int orderId, int userId) {
+        String sql = "UPDATE OrderTable SET Status = 'CANCELLED' "
+                   + "WHERE OrderId = ? AND UserId = ? AND Status = 'PLACED'";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private Order mapRow(ResultSet rs) throws SQLException {
         Order o = new Order();
         o.setOrderId(rs.getInt("OrderId"));

@@ -40,6 +40,19 @@
     .delivered { background: #DDF5E3; color: #1E8A3C; }
     .cancelled { background: #FDE0E0; color: #C53030; }
 
+    .cancel-box { margin-top: 24px; }
+    .cancel-btn {
+        background: #fff;
+        color: #C53030;
+        border: 2px solid #C53030;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .cancel-btn:hover { background: #C53030; color: #fff; }
+
     .empty { text-align: center; color: #999; margin-top: 40px; font-size: 16px; }
 </style>
 </head>
@@ -103,6 +116,16 @@
                 <td>&#8377;<%= order.getTotalAmount() %></td>
             </tr>
         </table>
+    <% } %>
+
+    <% if ("PLACED".equals(order.getStatus())) { %>
+        <div class="cancel-box">
+            <form action="cancelorder" method="post"
+                  onsubmit="return confirm('Cancel this order?');">
+                <input type="hidden" name="id" value="<%= order.getOrderId() %>">
+                <button type="submit" class="cancel-btn">Cancel Order</button>
+            </form>
+        </div>
     <% } %>
 </div>
 
