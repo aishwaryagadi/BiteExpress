@@ -40,10 +40,8 @@ public class UserDAOImpl implements UserDAO {
                 boolean ok;
 
                 if (stored != null && stored.startsWith("$2")) {
-                    // Already hashed
                     ok = BCrypt.verifyer().verify(password.toCharArray(), stored).verified;
                 } else {
-                    // Old plain-text password: accept it once, then upgrade it to a hash
                     ok = stored != null && stored.equals(password);
                     if (ok) {
                         upgradePassword(con, userId, password);
@@ -82,6 +80,21 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(1, phone);
             ResultSet rs = ps.executeQuery();
             return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Updates only name and email, for the user with this id
+    public boolean updateProfile(int userId, String name, String email) {
+        String sql = "UPDATE users SET Name=?, Email=? WHERE UserId=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setInt(3, userId);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
